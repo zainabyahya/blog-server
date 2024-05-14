@@ -2,7 +2,6 @@ const Post = require("../models/Post");
 const path = require("path");
 const fs = require("fs");
 
-
 const getAllPosts = async (req, res, next) => {
     try {
         const allPosts = await Post.find();
@@ -25,8 +24,18 @@ const getPostById = async (req, res, next) => {
 const getPostByAuthor = async (req, res, next) => {
     try {
         const { authorId } = req.params;
-        const foundPost = await Post.findById({ author: authorId });
-        res.status(200).json({ foundPost });
+        const foundPosts = await Post.findById({ author: authorId });
+        res.status(200).json({ foundPosts });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const getPostByCategory = async (req, res, next) => {
+    try {
+        const { categoryId } = req.params;
+        const foundPosts = await Post.findById({ tag: categoryId });
+        res.status(200).json({ foundPosts });
     } catch (error) {
         next(error);
     }
@@ -52,6 +61,13 @@ const addPost = async (req, res, next) => {
 const deletePost = async (req, res, next) => {
     try {
         const { postId } = req.params;
+        const { userId } = req.user.userId;
+        const checkPost = await Post.findByIdAndDelete(postId);
+        if (userId !== checkPost.author) {
+            return res.status(400).json({
+                message: `You don't have permission to delete this post`,
+            });
+        }
         const foundPost = await Post.findByIdAndDelete(postId);
         if (!foundPost) {
             return res.status(400).json({
@@ -78,9 +94,16 @@ const deletePost = async (req, res, next) => {
 };
 
 const updatePost = async (req, res, next) => {
-
     try {
         const { postId } = req.params;
+        const { userId } = req.user.userId;
+        const checkPost = await Post.findByIdAndDelete(postId);
+
+        if (userId !== checkPost.author) {
+            return res.status(400).json({
+                message: `You don't have permission to edit this post`,
+            });
+        }
         const updatedPost = await Post.findByIdAndUpdate(postId, req.body, { new: true });
         if (!updatedPost)
             return res.status(400).json({

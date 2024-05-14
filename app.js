@@ -10,11 +10,14 @@ const connectDB = require("./database.js");
 connectDB();
 
 const postRoutes = require("./posts/post.routes.js");
+const userRoutes = require("./users/user.routes.js");
+const categoryRoutes = require("./categories/category.routes.js");
 
 
 app.use(express.json());
 app.use(cors());
 app.use("/posts", postRoutes);
+app.use("/users", userRoutes);
 
 
 

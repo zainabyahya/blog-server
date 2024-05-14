@@ -40,6 +40,12 @@ const addUser = async (req, res, next) => {
 const deleteUser = async (req, res, next) => {
     try {
         const { userId } = req.params;
+        const { actingUserId } = req.user.userId;
+        if (userId !== actingUserId) {
+            return res.status(400).json({
+                message: `You don't have permission to delete this user`,
+            });
+        }
         const foundUser = await User.findByuserIdAndDelete(userId);
         if (!foundUser) {
             return res.status(400).json({
@@ -67,6 +73,12 @@ const deleteUser = async (req, res, next) => {
 const updateUser = async (req, res, next) => {
     try {
         const { userId } = req.params;
+        const { actingUserId } = req.user.userId;
+        if (userId !== actingUserId) {
+            return res.status(400).json({
+                message: `You don't have permission to edit this user`,
+            });
+        }
         const updatedUser = await User.findByuserIdAndUpdate(userId, req.body, { new: true });
         if (!updatedUser)
             return res.status(400).json({
