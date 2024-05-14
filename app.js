@@ -3,11 +3,19 @@ dotenv.config();
 
 const express = require('express');
 const app = express();
+const cors = require('cors');
+
 
 const connectDB = require("./database.js");
 connectDB();
 
+const postRoutes = require("./posts/post.routes.js");
+
+
 app.use(express.json());
+app.use(cors());
+app.use("/posts", postRoutes);
+
 
 
 app.get('/', (req, res) => {
