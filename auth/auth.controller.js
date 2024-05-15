@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const generateToken = (userCredentials) => {
     const payload = {
-        id: userCredentials._id,
+        userId: userCredentials._id,
         email: userCredentials.email,
         firstName: userCredentials.firstName,
         lastName: userCredentials.lastName,
@@ -18,9 +18,9 @@ const generateToken = (userCredentials) => {
 const login = async (req, res, next) => {
     try {
         console.log(req.body);
-        const { email, password } = req.body.email;
+        const { email, password } = req.body;
 
-        const foundUser = await User.findOne({ email });
+        const foundUser = await User.findOne({ email: email });
 
         if (!foundUser) {
             return res.status(401).json({ message: "Invalid email or password" });

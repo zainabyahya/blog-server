@@ -42,24 +42,6 @@ const getPostByCategory = async (req, res, next) => {
     }
 };
 
-// const addPost = async (req, res, next) => {
-//     try {
-//         const imageFile = req.file;
-//         const imageUrl = "images/" + imageFile.filename;
-//         const tags = req.body.tags;
-
-//         const newPostData = {
-//             ...req.body,
-//             author: req.user.id,
-//             dateCreated: Date.now(),
-//             image: imageUrl,
-//         };
-//         const newPost = await Post.create(newPostData);
-//         res.status(201).json({ newPost });
-//     } catch (error) {
-//         next(error);
-//     }
-// };
 const addPost = async (req, res, next) => {
     try {
         const imageFile = req.file;
