@@ -5,10 +5,6 @@ var validateEmail = function (email) {
     var re = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     return re.test(email)
 };
-var validatePassword = function (password) {
-    var re = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,20}$/;
-    return re.test(password)
-};
 
 const userSchema = new Schema({
     firstName: String,
@@ -25,7 +21,7 @@ const userSchema = new Schema({
         type: String,
         trim: true,
         required: 'Password is required',
-        validate: [validatePassword, 'Please choose a valid password'],
+        minlength: 8,
     },
     image: String,
 });

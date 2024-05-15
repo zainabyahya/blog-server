@@ -8,9 +8,9 @@ router.get("/", getAllActivities);
 
 router.get("/user/:userId", getActivityByUser);
 
-router.get("/author/:type", getActivityByType);
+router.get("/:postId/:type", getActivityByType);
 
-router.get("/category/:postId", getActivityByPost);
+router.get("/post/:postId", getActivityByPost);
 
 router.post("/", authenticateToken, addActivity);
 

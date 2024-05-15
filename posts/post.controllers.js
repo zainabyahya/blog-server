@@ -1,6 +1,7 @@
 const Post = require("../models/Post");
 const path = require("path");
 const fs = require("fs");
+const Category = require("../models/Category");
 
 const getAllPosts = async (req, res, next) => {
     try {
@@ -41,22 +42,56 @@ const getPostByCategory = async (req, res, next) => {
     }
 };
 
+// const addPost = async (req, res, next) => {
+//     try {
+//         const imageFile = req.file;
+//         const imageUrl = "images/" + imageFile.filename;
+//         const tags = req.body.tags;
+
+//         const newPostData = {
+//             ...req.body,
+//             author: req.user.id,
+//             dateCreated: Date.now(),
+//             image: imageUrl,
+//         };
+//         const newPost = await Post.create(newPostData);
+//         res.status(201).json({ newPost });
+//     } catch (error) {
+//         next(error);
+//     }
+// };
 const addPost = async (req, res, next) => {
     try {
         const imageFile = req.file;
-        console.log(imageFile);
-        const imageUrl = "images/" + imageFile.filename;
+        const imageUrl = "images/" + imageFile?.filename;
+        const tags = req.body.tags.split(' ').filter(tag => tag.trim() !== '');
+
+        // check if category exist, if not, add it
+        const existingCategories = await Category.find({ name: { $in: tags } });
+        const existingCategoryNames = existingCategories.map(cat => cat.name);
+        const newCategoryNames = tags.filter(tag => !existingCategoryNames.includes(tag));
+        const newCategories = await Category.insertMany(newCategoryNames.map(name => ({ name })));
+        const allCategories = [...existingCategories, ...newCategories];
+        const categoriesIds = allCategories.map(category => ({ _id: category._id }));
 
         const newPostData = {
             ...req.body,
+            author: req.user.id,
+            dateCreated: Date.now(),
             image: imageUrl,
+            tags: categoriesIds,
         };
+
         const newPost = await Post.create(newPostData);
+
         res.status(201).json({ newPost });
     } catch (error) {
         next(error);
     }
 };
+
+module.exports = addPost;
+
 
 const deletePost = async (req, res, next) => {
     try {
@@ -97,8 +132,7 @@ const updatePost = async (req, res, next) => {
     try {
         const { postId } = req.params;
         const { userId } = req.user.userId;
-        const checkPost = await Post.findByIdAndDelete(postId);
-
+        const checkPost = await Post.findById(postId);
         if (userId !== checkPost.author) {
             return res.status(400).json({
                 message: `You don't have permission to edit this post`,
@@ -115,4 +149,4 @@ const updatePost = async (req, res, next) => {
     }
 };
 
-module.exports = { getAllPosts, getPostById, getPostByAuthor, addPost, deletePost, updatePost };
+module.exports = { getAllPosts, getPostById, getPostByAuthor, getPostByCategory, addPost, deletePost, updatePost };

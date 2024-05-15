@@ -17,7 +17,8 @@ const postSchema = new Schema({
     },
     image: String,
     dateCreated: {
-        type: Date.now(),
+        type: Date,
+        required: true
     },
     dateEdited: Date,
     author: {
@@ -35,9 +36,21 @@ const postSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: "Category"
         }
-    ]
+    ],
+    like: {
+        type: Number,
+        defualt: 0
+    },
+    comment: {
+        type: Number,
+        default: 0
+    },
+    bookmark: {
+        type: Number,
+        default: 0
+    }
 
 });
 
-const Post = model('Post', PostSchema);
+const Post = model('Post', postSchema);
 module.exports = Post;

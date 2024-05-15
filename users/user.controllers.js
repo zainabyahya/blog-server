@@ -21,22 +21,6 @@ const getUserById = async (req, res, next) => {
     }
 };
 
-const addUser = async (req, res, next) => {
-    try {
-        const imageFile = req.file;
-        console.log(imageFile);
-        const imageUrl = "images/" + imageFile.filename;
-
-        const newUserData = {
-            ...req.body,
-            image: imageUrl,
-        };
-        const newUser = await User.create(newUserData);
-        res.status(201).json({ newUser });
-    } catch (error) {
-        next(error);
-    }
-};
 const deleteUser = async (req, res, next) => {
     try {
         const { userId } = req.params;
@@ -79,7 +63,7 @@ const updateUser = async (req, res, next) => {
                 message: `You don't have permission to edit this user`,
             });
         }
-        const updatedUser = await User.findByuserIdAndUpdate(userId, req.body, { new: true });
+        const updatedUser = await User.findByIdAndUpdate(userId, req.body, { new: true });
         if (!updatedUser)
             return res.status(400).json({
                 message: `Oops, it seems like the user you're looking for is not there`,
@@ -90,4 +74,4 @@ const updateUser = async (req, res, next) => {
     }
 };
 
-module.exports = { getAllUsers, getUserById, addUser, deleteUser, updateUser };
+module.exports = { getAllUsers, getUserById, deleteUser, updateUser };
