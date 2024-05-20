@@ -25,30 +25,23 @@ const postSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "User"
     },
-    activities: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: "Activity"
-        }
-    ],
     tags: [
         {
             type: Schema.Types.ObjectId,
             ref: "Category"
         }
     ],
-    like: {
-        type: Number,
-        defualt: 0
-    },
-    comment: {
+    likes: {
         type: Number,
         default: 0
     },
-    bookmark: {
-        type: Number,
-        default: 0
-    }
+    comments: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Comment"
+        }
+    ],
+
 
 });
 

@@ -14,6 +14,10 @@ const postRoutes = require("./posts/post.routes.js");
 const userRoutes = require("./users/user.routes.js");
 const categoryRoutes = require("./categories/category.routes.js");
 const ActivityRoutes = require("./activities/activity.routes.js");
+const BookmarkRoutes = require("./bookmarks/bookmark.routes.js");
+const CommentRoutes = require("./comments/comment.routes.js");
+
+
 const authRoutes = require("./auth/auth.routes.js");
 // const errorHandling = require("./middlewares/errorHandling.js");
 
@@ -26,6 +30,9 @@ app.use("/users", userRoutes);
 app.use("/categories", categoryRoutes);
 app.use("/activities", ActivityRoutes);
 app.use("/auth", authRoutes);
+app.use("/comments", CommentRoutes);
+app.use("/bookmark", BookmarkRoutes);
+
 app.use("/images", express.static(staticPath));
 
 // app.use(errorHandling);

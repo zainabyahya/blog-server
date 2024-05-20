@@ -15,7 +15,7 @@ const getAllPosts = async (req, res, next) => {
 const getPostById = async (req, res, next) => {
     try {
         const { postId } = req.params;
-        const foundPost = await Post.findById(postId);
+        const foundPost = await Post.findById(postId).populate('tags').populate('author');
         res.status(200).json({ foundPost });
     } catch (error) {
         next(error);
@@ -58,7 +58,7 @@ const addPost = async (req, res, next) => {
 
         const newPostData = {
             ...req.body,
-            author: req.user.id,
+            author: req.user.userId,
             dateCreated: Date.now(),
             image: imageUrl,
             tags: categoriesIds,
@@ -72,14 +72,13 @@ const addPost = async (req, res, next) => {
     }
 };
 
-module.exports = addPost;
 
 
 const deletePost = async (req, res, next) => {
     try {
         const { postId } = req.params;
-        const { userId } = req.user.userId;
-        const checkPost = await Post.findByIdAndDelete(postId);
+        const userId = req.user.userId;
+        const checkPost = await Post.findById(postId);
         if (userId !== checkPost.author) {
             return res.status(400).json({
                 message: `You don't have permission to delete this post`,
@@ -112,15 +111,32 @@ const deletePost = async (req, res, next) => {
 
 const updatePost = async (req, res, next) => {
     try {
-        const { postId } = req.params;
-        const { userId } = req.user.userId;
+        let imageUrl = "images/";
+        let newPostData = {};
+        const postId = req.param.postId;
+        console.log("🚀 ~ updatePost ~ postId:", postId)
+        const userId = req.user.userId;
         const checkPost = await Post.findById(postId);
-        if (userId !== checkPost.author) {
+        if (userId !== checkPost.author.toString()) {
             return res.status(400).json({
                 message: `You don't have permission to edit this post`,
             });
         }
-        const updatedPost = await Post.findByIdAndUpdate(postId, req.body, { new: true });
+        if (req.file) {
+            const imageFile = req.file;
+            console.log(imageFile);
+            imageUrl += imageFile.filename;
+            newPostData = {
+                ...req.body,
+                image: imageUrl
+            }
+        } else {
+            newPostData = {
+                ...req.body,
+            }
+        }
+
+        const updatedPost = await Post.findByIdAndUpdate(postId, newPostData, { new: true });
         if (!updatedPost)
             return res.status(400).json({
                 message: `Oops, it seems like the post you're looking for is not there`,

@@ -24,6 +24,7 @@ const userSchema = new Schema({
         minlength: 8,
     },
     image: String,
+    bookmark: { type: Schema.Types.ObjectId, ref: 'Bookmark' }
 });
 
 const User = model('User', userSchema);

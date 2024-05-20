@@ -18,7 +18,7 @@ const generateToken = (userCredentials) => {
 const login = async (req, res, next) => {
     try {
         console.log(req.body);
-        const { email, password } = req.body;
+        const { email, password } = req.body.email;
 
         const foundUser = await User.findOne({ email: email });
 
