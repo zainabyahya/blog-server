@@ -6,8 +6,6 @@ const generateToken = (userCredentials) => {
     const payload = {
         userId: userCredentials._id,
         email: userCredentials.email,
-        firstName: userCredentials.firstName,
-        lastName: userCredentials.lastName,
     };
     const token = jwt.sign(payload, process.env.SECRET_KEY, {
         expiresIn: Date.now() + 360,
@@ -36,6 +34,7 @@ const login = async (req, res, next) => {
             { userId: foundUser._id, email: foundUser.email },
             process.env.SECRET_KEY
         );
+        console.log("🚀 ~ login ~ token:", token)
 
         res.status(201).json(token);
     } catch (error) {

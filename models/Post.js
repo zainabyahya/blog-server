@@ -31,7 +31,7 @@ const postSchema = new Schema({
             ref: "Category"
         }
     ],
-    likes: {
+    likeCount: {
         type: Number,
         default: 0
     },
@@ -41,6 +41,7 @@ const postSchema = new Schema({
             ref: "Comment"
         }
     ],
+
 
 
 });

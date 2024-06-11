@@ -1,13 +1,15 @@
 const express = require("express");
 const router = express.Router();
-const { getAllBookmarks, addBookmark, deleteBookmark } = require("./bookmark.controllers.js");
+const { getAllBookmarks, handleBookmark, deleteBookmark, getBookmarksByUser } = require("./bookmark.controllers.js");
 const { authenticateToken } = require("../middlewares/auth.js");
 
 router.get("/", getAllBookmarks);
 
-router.post("/", authenticateToken, addBookmark);
+router.get("/:userId", authenticateToken, getBookmarksByUser);
 
-router.delete("/", authenticateToken, deleteBookmark);
+router.post("/", authenticateToken, handleBookmark);
+
+router.delete("/:postId", authenticateToken, deleteBookmark);
 
 
 module.exports = router;

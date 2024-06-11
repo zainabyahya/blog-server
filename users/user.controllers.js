@@ -14,7 +14,9 @@ const getAllUsers = async (req, res, next) => {
 const getUserById = async (req, res, next) => {
     try {
         const { userId } = req.params;
-        const foundUser = await User.findByuserId(userId);
+        console.log("🚀 ~ getUserById ~ userId:", userId)
+        const foundUser = await User.findById(userId);
+        console.log("🚀 ~ getUserById ~ foundUser:", foundUser)
         res.status(200).json({ foundUser });
     } catch (error) {
         next(error);

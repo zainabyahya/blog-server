@@ -10,11 +10,56 @@ const getAllBookmarks = async (req, res, next) => {
     }
 };
 
-const addBookmark = async (req, res, next) => {
+const getBookmarksByUser = async (req, res, next) => {
     try {
-        const newBookmarkData = { ...req.body };
-        const newBookmark = await Bookmark.create(newBookmarkData);
-        res.status(201).json({ newBookmark });
+        const userId = req.params.userId;
+        console.log("🚀 ~ getBookmarksByUser ~ userId:", userId)
+        const userBookmarks = await Bookmark.findOne({ user: userId }).populate('posts');
+        console.log("🚀 ~ getBookmarksByUser ~ userBookmarks:", userBookmarks)
+        res.status(200).json({ userBookmarks });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const handleBookmark = async (req, res, next) => {
+    try {
+        const userId = req.user.userId;
+        const postId = req.body.postId;
+        console.log("🚀 ~ handleBookmark ~ postId:", { _id: postId })
+
+        console.log("-------" + req.body);
+
+        let bookmark = await Bookmark.findOne({ user: userId });
+
+        if (bookmark) {
+            if (!bookmark.posts.includes(postId)) {
+                // const updatedBookmark = await Bookmark.findOneAndUpdate(
+                //     { user: userId },
+                //     { $push: { posts: { _id: postId } } },
+                //     { new: true }
+                // );
+                bookmark.posts.push(postId);
+                bookmark.save();
+            } else {
+                // const updatedBookmark = await Bookmark.findOneAndUpdate(
+                //     { user: userId },
+                //     { $pull: { posts: postId } },
+                //     { new: true },
+                // );
+                // if (updatedBookmark.posts.length === 0) {
+                //     await Bookmark.findByIdAndDelete(updatedBookmark._id);
+                // }
+                bookmark.posts.pull(postId);
+                bookmark.save();
+            }
+        } else {
+            bookmark = new Bookmark({ user: userId, posts: [postId] });
+            await bookmark.save();
+        }
+        console.log("🚀 ~ handleBookmark ~ bookmark:", bookmark)
+
+        res.status(201).json({ bookmark });
     } catch (error) {
         next(error);
     }
@@ -23,20 +68,27 @@ const addBookmark = async (req, res, next) => {
 
 const deleteBookmark = async (req, res, next) => {
     try {
-        const bookmarkId = req.params;
         const userId = req.user.userId;
+        const { postId } = req.params;
 
-        const checkBookmark = await Bookmark.findById(bookmarkId);
-        if (userId !== checkBookmark.user.toString()) {
-            return res.status(400).json({
-                message: `You don't have permission to remove this post`,
-            });
+        const updatedBookmark = await Bookmark.findOneAndUpdate(
+            { user: userId },
+            { $pull: { posts: postId } },
+            { new: true }
+        );
+
+        if (!updatedBookmark) {
+            return res.status(404).json({ message: "Bookmark not found" });
         }
-        await Bookmark.findByIdAndDelete(bookmarkId);
-        res.status(204).end();
+
+        if (updatedBookmark.posts.length === 0) {
+            await Bookmark.findByIdAndDelete(updatedBookmark._id);
+        }
+
+        res.status(200).json({ message: "Bookmark removed" });
     } catch (error) {
         next(error);
     }
 };
 
-module.exports = { getAllBookmarks, addBookmark, deleteBookmark };
+module.exports = { getAllBookmarks, handleBookmark, deleteBookmark, getBookmarksByUser };

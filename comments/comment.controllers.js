@@ -23,15 +23,14 @@ const getCommentsByPost = async (req, res, next) => {
 const addComment = async (req, res, next) => {
     try {
         const postId = req.body.post;
-        console.log("🚀 ~ addComment ~ postId:", postId);
-        console.log("🚀 ~ addComment ~ req.body,", req.body);
         const newCommentData = {
             ...req.body,
             user: req.user.userId,
         };
 
-
         const newComment = await Comment.create(newCommentData);
+        await Post.findByIdAndUpdate(postId, { $push: { comments: newComment._id } });
+
         res.status(201).json({ newComment });
     } catch (error) {
         next(error);
